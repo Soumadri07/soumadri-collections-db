@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soumadri Collections DB</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --saffron:#C8692A; --turmeric:#E8A020; --indigo:#1B2A4A;
+  --cream:#F7F0E6; --mud:#8B5E3C; --leaf:#3D6B4F;
+  --pale:#FDF8F2; --border:rgba(27,42,74,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--pale);color:var(--indigo);font-family:'Jost',sans-serif;min-height:100vh;}
+
+/* ── NAV ── */
+nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;box-shadow:0 2px 20px rgba(0,0,0,0.25);}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--cream);padding:0.9rem 0;display:flex;flex-direction:column;line-height:1.2;}
+.nav-brand small{font-family:'Tiro Bangla',serif;font-size:0.68rem;color:rgba(247,240,230,0.4);}
+.nav-tabs{display:flex;}
+.nav-tab{padding:1.1rem 1.5rem;background:none;border:none;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,240,230,0.5);cursor:pointer;border-bottom:2.5px solid transparent;transition:all 0.2s;}
+.nav-tab:hover{color:var(--cream);}.nav-tab.active{color:var(--turmeric);border-bottom-color:var(--turmeric);}
+
+/* ── PAGES ── */
+.page{display:none;}.page.active{display:block;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--indigo) 0%,#2d4270 100%);padding:2.5rem 3rem 2rem;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 24px,rgba(200,105,42,0.05) 24px,rgba(200,105,42,0.05) 48px);pointer-events:none;}
+.hero-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap;}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:var(--cream);line-height:1.1;}
+.hero h1 em{color:var(--turmeric);font-style:italic;}
+.hero-stats{display:flex;gap:2rem;}
+.stat{text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--turmeric);line-height:1;}
+.stat-label{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,240,230,0.5);margin-top:0.2rem;}
+
+/* ── LOADING BANNER ── */
+.loading-bar{background:var(--turmeric);color:var(--indigo);text-align:center;padding:0.5rem;font-size:0.82rem;font-weight:500;letter-spacing:0.06em;display:none;}
+.loading-bar.show{display:block;}
+.sync-status{font-size:0.75rem;color:rgba(247,240,230,0.5);padding:0.3rem 1rem;text-align:right;max-width:1200px;margin:0 auto;}
+
+/* ── SETUP BANNER ── */
+.setup-banner{background:#fff3cd;border:1.5px solid #f0c040;padding:1.2rem 2rem;margin:1.5rem auto;max-width:1200px;font-size:0.88rem;line-height:1.7;}
+.setup-banner strong{color:var(--saffron);}
+.setup-banner code{background:rgba(0,0,0,0.07);padding:0.1rem 0.4rem;font-family:monospace;font-size:0.85rem;}
+
+/* ── CONTROLS ── */
+.controls-bar{max-width:1200px;margin:1.8rem auto 0;padding:0 2rem;display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center;}
+.search-wrap{flex:1;min-width:200px;position:relative;}
+.search-wrap input{width:100%;padding:0.7rem 1rem 0.7rem 2.5rem;border:1.5px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.88rem;color:var(--indigo);outline:none;transition:border-color 0.2s;}
+.search-wrap input:focus{border-color:var(--saffron);}
+.search-icon{position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);font-size:0.88rem;}
+.ctrl-btn{padding:0.65rem 1.1rem;border:1.5px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.78rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--indigo);cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.ctrl-btn:hover{background:var(--leaf);border-color:var(--leaf);color:white;}
+
+/* ── CATEGORY STRIP ── */
+.cat-strip{max-width:1200px;margin:1rem auto 0;padding:0 2rem;display:flex;gap:0.5rem;flex-wrap:wrap;}
+.cat-pill{padding:0.42rem 1rem;border:1.5px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.73rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--indigo);cursor:pointer;border-radius:999px;transition:all 0.2s;}
+.cat-pill:hover{border-color:var(--saffron);color:var(--saffron);}
+.cat-pill.active{background:var(--saffron);border-color:var(--saffron);color:white;}
+
+.results-info{max-width:1200px;margin:1.2rem auto 0.5rem;padding:0 2rem;font-size:0.78rem;color:var(--mud);}
+
+/* ── GALLERY ── */
+.gallery{max-width:1200px;margin:0 auto;padding:0.5rem 2rem 5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:1.4rem;}
+.card{background:white;border:1px solid var(--border);cursor:pointer;transition:transform 0.22s,box-shadow 0.22s;animation:fadeUp 0.35s ease both;}
+.card:hover{transform:translateY(-5px);box-shadow:0 14px 40px rgba(27,42,74,0.13);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.card-photo{width:100%;height:210px;object-fit:cover;display:block;background:var(--cream);}
+.card-ph{width:100%;height:210px;background:linear-gradient(135deg,var(--cream),#e8d9c4);display:flex;align-items:center;justify-content:center;font-size:3.5rem;}
+.card-body{padding:1rem 1.1rem 1.2rem;}
+.card-cat{font-size:0.67rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--saffron);margin-bottom:0.3rem;}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--indigo);line-height:1.2;margin-bottom:0.35rem;}
+.card-artist{font-size:0.8rem;color:var(--mud);}
+.card-loc{font-size:0.74rem;color:rgba(27,42,74,0.45);margin-top:0.18rem;}
+
+/* ── ARTISAN GRID ── */
+.artisan-grid{max-width:1200px;margin:0 auto;padding:0.5rem 2rem 5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.4rem;}
+.a-card{background:white;border:1px solid var(--border);cursor:pointer;transition:transform 0.22s,box-shadow 0.22s;animation:fadeUp 0.35s ease both;text-align:center;}
+.a-card:hover{transform:translateY(-5px);box-shadow:0 14px 40px rgba(27,42,74,0.13);}
+.a-photo{width:100%;height:200px;object-fit:cover;object-position:top;display:block;background:var(--cream);}
+.a-ph{width:100%;height:200px;background:linear-gradient(160deg,#e8d9c4,var(--cream));display:flex;align-items:center;justify-content:center;font-size:4rem;}
+.a-body{padding:1rem 1rem 1.2rem;}
+.a-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--indigo);}
+.a-craft{font-size:0.73rem;color:var(--saffron);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.2rem;}
+.a-loc{font-size:0.73rem;color:rgba(27,42,74,0.45);margin-top:0.22rem;}
+.a-count{font-size:0.73rem;color:var(--leaf);margin-top:0.35rem;font-weight:500;}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:2.5rem;right:2.5rem;background:var(--saffron);color:white;border:none;width:56px;height:56px;border-radius:50%;font-size:1.6rem;cursor:pointer;z-index:150;box-shadow:0 4px 22px rgba(200,105,42,0.45);transition:transform 0.2s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;}
+.fab:hover{transform:scale(1.1);box-shadow:0 6px 30px rgba(200,105,42,0.55);}
+
+/* ── OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(8,14,28,0.88);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity 0.28s;}
+.overlay.open{opacity:1;pointer-events:all;}
+
+/* ── ITEM MODAL ── */
+.item-modal{background:var(--pale);max-width:860px;width:100%;max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;transform:translateY(18px);transition:transform 0.28s;}
+.overlay.open .item-modal{transform:translateY(0);}
+.m-img{width:100%;height:100%;min-height:340px;object-fit:cover;display:block;background:var(--cream);}
+.m-img-ph{width:100%;min-height:340px;background:linear-gradient(135deg,var(--cream),#e0cdb5);display:flex;align-items:center;justify-content:center;font-size:6rem;}
+.m-body{padding:2rem;display:flex;flex-direction:column;gap:1rem;overflow-y:auto;}
+.m-close{align-self:flex-end;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--mud);}
+.m-cat{font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--saffron);font-weight:500;}
+.m-title{font-family:'Cormorant Garamond',serif;font-size:1.85rem;font-weight:600;color:var(--indigo);line-height:1.15;}
+.m-rule{height:1.5px;background:linear-gradient(to right,var(--saffron),transparent);}
+.d-row{display:flex;flex-direction:column;gap:0.18rem;}
+.d-label{font-size:0.67rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mud);font-weight:500;}
+.d-val{font-size:0.92rem;color:var(--indigo);line-height:1.55;}
+.d-story{font-size:0.87rem;color:rgba(27,42,74,0.72);line-height:1.75;font-style:italic;}
+.m-art-link{display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0.9rem;background:var(--cream);border:1px solid var(--border);cursor:pointer;transition:border-color 0.2s;margin-top:auto;}
+.m-art-link:hover{border-color:var(--saffron);}
+.m-art-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;background:var(--cream);flex-shrink:0;}
+.m-art-thumb-ph{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--cream),#e0cdb5);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.m-art-info{flex:1;min-width:0;}
+.m-art-info small{display:block;font-size:0.67rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--mud);}
+.m-art-info strong{font-size:0.9rem;color:var(--indigo);}
+.m-btns{display:flex;gap:0.6rem;flex-wrap:wrap;}
+.m-btn{padding:0.48rem 1rem;background:none;border:1px solid rgba(200,105,42,0.3);color:var(--saffron);font-family:'Jost',sans-serif;font-size:0.74rem;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.2s;}
+.m-btn:hover{background:var(--saffron);color:white;}
+
+/* ── ARTISAN MODAL ── */
+.art-modal{background:var(--pale);max-width:700px;width:100%;max-height:92vh;overflow-y:auto;transform:translateY(18px);transition:transform 0.28s;position:relative;}
+.overlay.open .art-modal{transform:translateY(0);}
+.art-m-header{display:grid;grid-template-columns:180px 1fr;background:var(--indigo);min-height:190px;}
+.art-m-photo{width:100%;height:100%;object-fit:cover;object-position:top;min-height:190px;}
+.art-m-ph{width:100%;min-height:190px;background:linear-gradient(135deg,#2d4270,var(--indigo));display:flex;align-items:center;justify-content:center;font-size:5rem;}
+.art-m-info{padding:1.5rem;display:flex;flex-direction:column;justify-content:center;gap:0.6rem;}
+.art-m-name{font-family:'Cormorant Garamond',serif;font-size:1.85rem;font-weight:600;color:var(--cream);line-height:1.1;}
+.art-m-meta{font-size:0.8rem;color:rgba(247,240,230,0.6);}
+.art-m-meta span{color:var(--turmeric);}
+.art-m-close{position:absolute;top:0.9rem;right:1rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:rgba(247,240,230,0.65);}
+.art-m-body{padding:1.5rem 2rem 2rem;display:flex;flex-direction:column;gap:1.2rem;}
+.works-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--indigo);border-bottom:1.5px solid var(--border);padding-bottom:0.5rem;}
+.works-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:0.8rem;}
+.work-thumb{cursor:pointer;border:1px solid var(--border);overflow:hidden;transition:transform 0.2s;}
+.work-thumb:hover{transform:scale(1.03);border-color:var(--saffron);}
+.work-thumb img{width:100%;height:105px;object-fit:cover;display:block;}
+.work-thumb-ph{width:100%;height:105px;background:linear-gradient(135deg,var(--cream),#e0cdb5);display:flex;align-items:center;justify-content:center;font-size:2rem;}
+.work-label{padding:0.38rem 0.5rem;font-size:0.74rem;color:var(--indigo);line-height:1.2;}
+
+/* ── FORM MODAL ── */
+.form-modal{background:white;max-width:580px;width:100%;max-height:92vh;overflow-y:auto;padding:2.5rem;transform:translateY(18px);transition:transform 0.28s;}
+.overlay.open .form-modal{transform:translateY(0);}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--indigo);margin-bottom:1.5rem;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.fg{display:flex;flex-direction:column;gap:0.35rem;}
+.fg.full{grid-column:1/-1;}
+.fg label{font-size:0.67rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--mud);font-weight:500;}
+.fg input,.fg select,.fg textarea{padding:0.65rem 0.8rem;border:1.5px solid rgba(27,42,74,0.15);font-family:'Jost',sans-serif;font-size:0.88rem;color:var(--indigo);outline:none;transition:border-color 0.2s;background:var(--pale);}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--saffron);}
+.fg textarea{resize:vertical;min-height:85px;}
+.form-actions{display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:flex-end;align-items:center;}
+.btn-cancel{padding:0.7rem 1.4rem;border:1.5px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.85rem;cursor:pointer;color:var(--indigo);}
+.btn-save{padding:0.7rem 1.8rem;background:var(--saffron);border:none;font-family:'Jost',sans-serif;font-size:0.85rem;font-weight:500;color:white;cursor:pointer;transition:background 0.2s;}
+.btn-save:hover{background:var(--mud);}
+.btn-save:disabled{background:#ccc;cursor:not-allowed;}
+.saving-msg{font-size:0.78rem;color:var(--mud);font-style:italic;}
+.add-cat-row{display:flex;gap:0.6rem;margin-top:0.4rem;}
+.add-cat-row input{flex:1;padding:0.55rem 0.7rem;border:1.5px solid var(--border);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;background:var(--pale);}
+.add-cat-row input:focus{border-color:var(--saffron);}
+.add-cat-row button{padding:0.55rem 1rem;background:var(--leaf);border:none;color:white;font-family:'Jost',sans-serif;font-size:0.8rem;cursor:pointer;}
+
+/* ── SETUP MODAL ── */
+.setup-modal{background:white;max-width:560px;width:100%;padding:2.5rem;transform:translateY(18px);transition:transform 0.28s;}
+.overlay.open .setup-modal{transform:translateY(0);}
+.setup-steps{margin-top:1rem;display:flex;flex-direction:column;gap:0.9rem;}
+.step{display:flex;gap:0.9rem;align-items:flex-start;}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--saffron);color:white;font-size:0.8rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:0.1rem;}
+.step-text{font-size:0.88rem;line-height:1.6;color:var(--indigo);}
+.step-text code{background:rgba(27,42,74,0.08);padding:0.1rem 0.4rem;font-family:monospace;font-size:0.82rem;border-radius:3px;}
+.url-input-row{display:flex;gap:0.6rem;margin-top:1.5rem;}
+.url-input-row input{flex:1;padding:0.65rem 0.8rem;border:1.5px solid var(--border);font-family:'Jost',sans-serif;font-size:0.85rem;color:var(--indigo);outline:none;}
+.url-input-row input:focus{border-color:var(--saffron);}
+.url-input-row button{padding:0.65rem 1.2rem;background:var(--saffron);border:none;color:white;font-family:'Jost',sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;white-space:nowrap;}
+
+.empty{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--mud);}
+.empty p{font-family:'Cormorant Garamond',serif;font-size:1.5rem;}
+.empty small{font-size:0.82rem;opacity:0.6;}
+
+@media(max-width:660px){
+  .item-modal{grid-template-columns:1fr;}.m-img,.m-img-ph{min-height:220px;}
+  .art-m-header{grid-template-columns:1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .gallery,.artisan-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+  nav{padding:0 1rem;}.hero{padding:1.8rem 1.5rem 1.5rem;}.hero h1{font-size:1.8rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-bar" id="loadingBar">Loading your collection from Google Sheets…</div>
+
+<nav>
+  <div class="nav-brand">Soumadri Collections DB<small>বাংলার লোকশিল্প সংগ্রহ</small></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('collection')">Collection</button>
+    <button class="nav-tab" onclick="showPage('artisans')">Artisans</button>
+  </div>
+</nav>
+
+<!-- COLLECTION PAGE -->
+<div class="page active" id="page-collection">
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>Soumadri<br><em>Collections DB</em></h1>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num" id="stat-items">—</div><div class="stat-label">Items</div></div>
+        <div class="stat"><div class="stat-num" id="stat-artisans">—</div><div class="stat-label">Artisans</div></div>
+        <div class="stat"><div class="stat-num" id="stat-districts">—</div><div class="stat-label">Districts</div></div>
+      </div>
+    </div>
+  </div>
+  <div id="setupBanner"></div>
+  <div class="sync-status" id="syncStatus"></div>
+  <div class="controls-bar">
+    <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="itemSearch" placeholder="Search items, artisans, locations…" oninput="renderGallery()"></div>
+    <button class="ctrl-btn" onclick="loadAll()">↺ Refresh</button>
+    <button class="ctrl-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="ctrl-btn" onclick="openSetup()">⚙ Setup</button>
+  </div>
+  <div class="cat-strip" id="catStrip"></div>
+  <div class="results-info" id="resultsInfo"></div>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<!-- ARTISANS PAGE -->
+<div class="page" id="page-artisans">
+  <div class="hero"><div class="hero-inner"><h1>The <em>Artisans</em></h1></div></div>
+  <div class="controls-bar">
+    <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="artisanSearch" placeholder="Search artisans, craft, district…" oninput="renderArtisans()"></div>
+  </div>
+  <div class="results-info" id="artisanInfo"></div>
+  <div class="artisan-grid" id="artisanGrid"></div>
+</div>
+
+<!-- ITEM DETAIL -->
+<div class="overlay" id="itemOverlay" onclick="closeOverlay('itemOverlay')">
+  <div class="item-modal" id="itemModalContent" onclick="event.stopPropagation()"></div>
+</div>
+
+<!-- ARTISAN DETAIL -->
+<div class="overlay" id="artisanOverlay" onclick="closeOverlay('artisanOverlay')">
+  <div class="art-modal" id="artisanModalContent" onclick="event.stopPropagation()"></div>
+</div>
+
+<!-- ADD ITEM -->
+<div class="overlay" id="addItemOverlay" onclick="closeOverlay('addItemOverlay')">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <div class="form-title" id="addItemTitle">Add New Item</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Item Name *</label><input type="text" id="fi_name" placeholder="e.g. Dancing Ganesha Dokra"></div>
+      <div class="fg"><label>Category *</label><select id="fi_cat"></select></div>
+      <div class="fg"><label>Artisan</label><select id="fi_artisan"></select></div>
+      <div class="fg full"><label>Photo URL (from Google Photos)</label><input type="text" id="fi_photo" placeholder="Paste direct image link here"></div>
+      <div class="fg"><label>Materials Used</label><input type="text" id="fi_materials" placeholder="e.g. Bell metal, wax"></div>
+      <div class="fg"><label>Year Acquired</label><input type="text" id="fi_year" placeholder="e.g. 2024"></div>
+      <div class="fg full"><label>Description & Story</label><textarea id="fi_details" placeholder="Describe the piece, its significance, technique…"></textarea></div>
+      <div class="fg full"><label>Add a New Category</label><div class="add-cat-row"><input type="text" id="newCatInput" placeholder="e.g. Jute Craft, Bamboo Work…"><button onclick="addCategory()">+ Add</button></div></div>
+    </div>
+    <div class="form-actions">
+      <span class="saving-msg" id="itemSavingMsg"></span>
+      <button class="btn-cancel" onclick="closeOverlay('addItemOverlay')">Cancel</button>
+      <button class="btn-save" id="itemSaveBtn" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ARTISAN -->
+<div class="overlay" id="addArtisanOverlay" onclick="closeOverlay('addArtisanOverlay')">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <div class="form-title" id="addArtisanTitle">Add New Artisan</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Full Name *</label><input type="text" id="fa_name" placeholder="e.g. Mangal Chandra Karmakar"></div>
+      <div class="fg"><label>Age</label><input type="text" id="fa_age" placeholder="e.g. 58"></div>
+      <div class="fg"><label>Primary Craft</label><input type="text" id="fa_craft" placeholder="e.g. Dokra"></div>
+      <div class="fg"><label>Village</label><input type="text" id="fa_village" placeholder="e.g. Bikna"></div>
+      <div class="fg"><label>District</label><input type="text" id="fa_district" placeholder="e.g. Bankura"></div>
+      <div class="fg"><label>Years Practising</label><input type="text" id="fa_years" placeholder="e.g. 35"></div>
+      <div class="fg full"><label>Photo URL (from Google Photos)</label><input type="text" id="fa_photo" placeholder="Paste direct image link here"></div>
+      <div class="fg full"><label>Craft Tradition & Background Story</label><textarea id="fa_story" placeholder="Their background, how they learnt, what makes their work distinctive…"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <span class="saving-msg" id="artisanSavingMsg"></span>
+      <button class="btn-cancel" onclick="closeOverlay('addArtisanOverlay')">Cancel</button>
+      <button class="btn-save" id="artisanSaveBtn" onclick="saveArtisan()">Save Artisan</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP MODAL -->
+<div class="overlay" id="setupOverlay" onclick="closeOverlay('setupOverlay')">
+  <div class="setup-modal" onclick="event.stopPropagation()">
+    <div class="form-title">Connect Soumadri Collections DB to Google Sheets</div>
+    <p style="font-size:0.88rem;color:var(--mud);line-height:1.6;margin-bottom:0.5rem;">This connects your website to a Google Sheet so all your data saves permanently. One-time setup, takes about 5 minutes.</p>
+    <div class="setup-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Go to <strong>script.google.com</strong> → click <strong>New project</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Open the file <code>Code.gs</code> (provided with this website) and paste all its contents into the editor, replacing everything there</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">In the same script, go to <strong>Extensions → Apps Script</strong>, then click the blue <strong>Deploy</strong> button → <strong>New deployment</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Set <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong> → click Deploy → copy the Web App URL</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Paste the URL below and click Connect</div></div>
+    </div>
+    <div class="url-input-row">
+      <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+      <button onclick="connectSheet()">Connect</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--mud);margin-top:0.8rem;line-height:1.5;">Your data is stored in <em>your own</em> Google account. This website only reads and writes to your Sheet — nothing goes anywhere else.</p>
+  </div>
+</div>
+
+<button class="fab" onclick="openAddForm()">+</button>
+
+<script>
+// ════════════════════════════════════════
+// CONFIG — paste your Apps Script URL here after setup
+// ════════════════════════════════════════
+var SCRIPT_URL = localStorage.getItem('soumadriScriptUrl') || '';
+
+// ════════════════════════════════════════
+// IN-MEMORY DATA
+// ════════════════════════════════════════
+var categories = [];
+var artisans   = [];
+var items      = [];
+var activeCat  = 'all';
+var currentPage = 'collection';
+var editingItemId = null;
+var editingArtisanId = null;
+var nextItemId = 1;
+var nextArtisanId = 1;
+
+const catEmoji = {'Wooden Doll':'🪆','Wooden Carving':'🪵','Masks':'🎭','Patachitra':'🎨','Clay Dolls':'🏺','Clay Items':'🏺','Kantha':'🪡','Horn/Bone Craft':'🦴','Sholapith':'🌿','Dokra':'🔔','Lac Dolls':'💛'};
+function gE(cat){return catEmoji[cat]||'🎭';}
+
+// ════════════════════════════════════════
+// API CALLS
+// ════════════════════════════════════════
+async function apiGet(sheet) {
+  if(!SCRIPT_URL) return null;
+  try {
+    const r = await fetch(SCRIPT_URL + '?sheet=' + sheet);
+    return await r.json();
+  } catch(e) { console.error('GET error',e); return null; }
+}
+
+async function apiPost(payload) {
+  if(!SCRIPT_URL) return null;
+  try {
+    const r = await fetch(SCRIPT_URL, {
+      method:'POST', redirect:'follow',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    return await r.json();
+  } catch(e) { console.error('POST error',e); return null; }
+}
+
+// ════════════════════════════════════════
+// LOAD ALL DATA
+// ════════════════════════════════════════
+async function loadAll() {
+  if(!SCRIPT_URL) { showSetupBanner(); renderGallery(); renderArtisans(); return; }
+  setLoading(true);
+  setSyncStatus('Syncing with Google Sheets…');
+  try {
+    const [cats, arts, itms] = await Promise.all([
+      apiGet('categories'), apiGet('artisans'), apiGet('items')
+    ]);
+    if(cats && Array.isArray(cats)) {
+      categories = cats.map(r=>r.name).filter(Boolean);
+    }
+    if(arts && Array.isArray(arts)) {
+      artisans = arts.map(a=>({...a, id:Number(a.id)}));
+      nextArtisanId = artisans.length ? Math.max(...artisans.map(a=>a.id)) + 1 : 1;
+    }
+    if(itms && Array.isArray(itms)) {
+      items = itms.map(i=>({...i, id:Number(i.id), artisanId:i.artisanId?Number(i.artisanId):null}));
+      nextItemId = items.length ? Math.max(...items.map(i=>i.id)) + 1 : 1;
+    }
+    setSyncStatus('Last synced: ' + new Date().toLocaleTimeString());
+    document.getElementById('setupBanner').innerHTML = '';
+  } catch(e) {
+    setSyncStatus('⚠ Could not reach Google Sheets');
+  }
+  setLoading(false);
+  buildCatStrip();
+  renderGallery();
+  renderArtisans();
+  updateStats();
+}
+
+function setLoading(on) {
+  document.getElementById('loadingBar').classList.toggle('show', on);
+}
+function setSyncStatus(msg) {
+  document.getElementById('syncStatus').textContent = msg;
+}
+function showSetupBanner() {
+  document.getElementById('setupBanner').innerHTML = `
+    <div class="setup-banner" style="margin:1.5rem 2rem;">
+      <strong>⚙ Not connected to Google Sheets yet.</strong> Your data will reset when you refresh the page.<br>
+      Click the <strong>Setup</strong> button in the toolbar to connect your Google Sheet and save data permanently.
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// SETUP
+// ════════════════════════════════════════
+function openSetup() {
+  document.getElementById('scriptUrlInput').value = SCRIPT_URL || '';
+  openOverlay('setupOverlay');
+}
+function connectSheet() {
+  var url = document.getElementById('scriptUrlInput').value.trim();
+  if(!url || !url.includes('script.google')) { alert('Please paste a valid Google Apps Script URL.'); return; }
+  SCRIPT_URL = url;
+  localStorage.setItem('soumadriScriptUrl', url);
+  closeOverlay('setupOverlay');
+  loadAll();
+}
+
+// ════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════
+function showPage(name) {
+  currentPage = name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>{if(t.textContent.toLowerCase().startsWith(name.slice(0,3)))t.classList.add('active');});
+}
+
+// ════════════════════════════════════════
+// CATEGORY STRIP
+// ════════════════════════════════════════
+function buildCatStrip() {
+  const s = document.getElementById('catStrip');
+  s.innerHTML = '';
+  ['all',...categories].forEach(c=>{
+    const b = document.createElement('button');
+    b.className = 'cat-pill'+(activeCat===c?' active':'');
+    b.textContent = c==='all'?'All':c;
+    b.onclick = ()=>{ activeCat=c; buildCatStrip(); renderGallery(); };
+    s.appendChild(b);
+  });
+}
+
+// ════════════════════════════════════════
+// RENDER GALLERY
+// ════════════════════════════════════════
+function renderGallery() {
+  const term = (document.getElementById('itemSearch').value||'').toLowerCase();
+  const filtered = items.filter(item=>{
+    const a = artisans.find(x=>x.id===item.artisanId);
+    const mc = activeCat==='all'||item.category===activeCat;
+    const ms = !term||item.name.toLowerCase().includes(term)||item.category.toLowerCase().includes(term)||(item.materials||'').toLowerCase().includes(term)||(a&&a.name.toLowerCase().includes(term))||(a&&(a.district||'').toLowerCase().includes(term))||(a&&(a.village||'').toLowerCase().includes(term));
+    return mc&&ms;
+  });
+  document.getElementById('resultsInfo').textContent = filtered.length===items.length?`Showing all ${items.length} items`:`Showing ${filtered.length} of ${items.length} items`;
+  updateStats();
+  const g = document.getElementById('gallery');
+  if(!filtered.length){
+    g.innerHTML = items.length===0
+      ? `<div class="empty"><p>No items yet</p><small>Click the + button to add your first item</small></div>`
+      : `<div class="empty"><p>No items found</p><small>Try a different search or category</small></div>`;
+    return;
+  }
+  g.innerHTML = filtered.map((item,i)=>{
+    const a = artisans.find(x=>x.id===item.artisanId);
+    return `<div class="card" style="animation-delay:${i*0.03}s" onclick="openItem(${item.id})">
+      ${item.photo?`<img class="card-photo" src="${item.photo}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'card-ph\\'>${gE(item.category)}</div>'">`:`<div class="card-ph">${gE(item.category)}</div>`}
+      <div class="card-body">
+        <div class="card-cat">${item.category||''}</div>
+        <div class="card-name">${item.name}</div>
+        ${a?`<div class="card-artist">by ${a.name}</div>`:''}
+        ${a?`<div class="card-loc">📍 ${[a.village,a.district].filter(Boolean).join(', ')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// RENDER ARTISANS
+// ════════════════════════════════════════
+function renderArtisans() {
+  const term = (document.getElementById('artisanSearch').value||'').toLowerCase();
+  const filtered = artisans.filter(a=>!term||a.name.toLowerCase().includes(term)||(a.craft||'').toLowerCase().includes(term)||(a.district||'').toLowerCase().includes(term)||(a.village||'').toLowerCase().includes(term));
+  document.getElementById('artisanInfo').textContent = filtered.length===artisans.length?`${artisans.length} artisans in the collection`:`Showing ${filtered.length} of ${artisans.length} artisans`;
+  const g = document.getElementById('artisanGrid');
+  if(!filtered.length){
+    g.innerHTML = `<div class="empty"><p>${artisans.length===0?'No artisans yet':'No artisans found'}</p><small>${artisans.length===0?'Click the + button to add an artisan':''}</small></div>`;
+    return;
+  }
+  g.innerHTML = filtered.map((a,i)=>{
+    const cnt = items.filter(it=>it.artisanId===a.id).length;
+    return `<div class="a-card" style="animation-delay:${i*0.03}s" onclick="openArtisan(${a.id})">
+      ${a.photo?`<img class="a-photo" src="${a.photo}" alt="${a.name}" onerror="this.outerHTML='<div class=\\'a-ph\\'>👤</div>'">`:`<div class="a-ph">👤</div>`}
+      <div class="a-body">
+        <div class="a-name">${a.name}</div>
+        <div class="a-craft">${a.craft||'—'}</div>
+        <div class="a-loc">📍 ${[a.village,a.district].filter(Boolean).join(', ')||'—'}</div>
+        <div class="a-count">${cnt} item${cnt!==1?'s':''} in collection</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════
+function updateStats() {
+  document.getElementById('stat-items').textContent = items.length;
+  document.getElementById('stat-artisans').textContent = artisans.length;
+  document.getElementById('stat-districts').textContent = new Set(artisans.map(a=>a.district).filter(Boolean)).size;
+}
+
+// ════════════════════════════════════════
+// OPEN ITEM MODAL
+// ════════════════════════════════════════
+function openItem(id) {
+  const item = items.find(i=>i.id===id);
+  if(!item) return;
+  const a = artisans.find(x=>x.id===item.artisanId);
+  document.getElementById('itemModalContent').innerHTML = `
+    ${item.photo?`<img class="m-img" src="${item.photo}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'m-img-ph\\'>${gE(item.category)}</div>'">`:`<div class="m-img-ph">${gE(item.category)}</div>`}
+    <div class="m-body">
+      <button class="m-close" onclick="closeOverlay('itemOverlay')">✕</button>
+      <div class="m-cat">${item.category||''}</div>
+      <div class="m-title">${item.name}</div>
+      <div class="m-rule"></div>
+      ${item.materials?`<div class="d-row"><span class="d-label">Materials</span><span class="d-val">${item.materials}</span></div>`:''}
+      ${item.year?`<div class="d-row"><span class="d-label">Year Acquired</span><span class="d-val">${item.year}</span></div>`:''}
+      ${item.details?`<div class="d-row"><span class="d-label">About this piece</span><p class="d-story">${item.details}</p></div>`:''}
+      ${a?`<div class="m-art-link" onclick="closeOverlay('itemOverlay');openArtisan(${a.id})">
+        ${a.photo?`<img class="m-art-thumb" src="${a.photo}" onerror="this.outerHTML='<div class=\\'m-art-thumb-ph\\'>👤</div>'">`:`<div class="m-art-thumb-ph">👤</div>`}
+        <div class="m-art-info"><small>Artisan</small><strong>${a.name}</strong></div>
+        <span style="color:var(--saffron);font-size:1.1rem;">→</span>
+      </div>`:''}
+      <div class="m-btns" style="margin-top:auto;">
+        <button class="m-btn" onclick="editItem(${item.id})">✏ Edit</button>
+        <button class="m-btn" onclick="deleteItem(${item.id})">✕ Remove</button>
+      </div>
+    </div>`;
+  openOverlay('itemOverlay');
+}
+
+// ════════════════════════════════════════
+// OPEN ARTISAN MODAL
+// ════════════════════════════════════════
+function openArtisan(id) {
+  const a = artisans.find(x=>x.id===id);
+  if(!a) return;
+  const works = items.filter(i=>i.artisanId===id);
+  document.getElementById('artisanModalContent').innerHTML = `
+    <div class="art-m-header">
+      ${a.photo?`<img class="art-m-photo" src="${a.photo}" onerror="this.outerHTML='<div class=\\'art-m-ph\\'>👤</div>'">`:`<div class="art-m-ph">👤</div>`}
+      <div class="art-m-info">
+        <div class="art-m-name">${a.name}</div>
+        <div class="art-m-meta">${a.craft||''}${a.age?' · <span>Age '+a.age+'</span>':''}</div>
+        <div class="art-m-meta">📍 ${[a.village,a.district].filter(Boolean).join(', ')||'—'}</div>
+        ${a.years?`<div class="art-m-meta"><span>${a.years} years</span> practising</div>`:''}
+      </div>
+    </div>
+    <button class="art-m-close" onclick="closeOverlay('artisanOverlay')">✕</button>
+    <div class="art-m-body">
+      ${a.story?`<div class="d-row"><span class="d-label">Background</span><p class="d-story">${a.story}</p></div>`:''}
+      <div class="works-title">Works in Collection (${works.length})</div>
+      ${works.length?`<div class="works-grid">${works.map(w=>`
+        <div class="work-thumb" onclick="closeOverlay('artisanOverlay');openItem(${w.id})">
+          ${w.photo?`<img src="${w.photo}" onerror="this.outerHTML='<div class=\\'work-thumb-ph\\'>${gE(w.category)}</div>'">`:`<div class="work-thumb-ph">${gE(w.category)}</div>`}
+          <div class="work-label">${w.name}</div>
+        </div>`).join('')}</div>`:`<p style="font-size:0.85rem;color:var(--mud);font-style:italic;">No items linked yet.</p>`}
+      <div class="m-btns" style="margin-top:0.5rem;">
+        <button class="m-btn" onclick="editArtisan(${a.id})">✏ Edit</button>
+        <button class="m-btn" onclick="deleteArtisan(${a.id})">✕ Remove</button>
+      </div>
+    </div>`;
+  openOverlay('artisanOverlay');
+}
+
+// ════════════════════════════════════════
+// FAB
+// ════════════════════════════════════════
+function openAddForm() {
+  if(currentPage==='artisans') openAddArtisanForm();
+  else openAddItemForm();
+}
+
+// ════════════════════════════════════════
+// ADD / EDIT ITEM
+// ════════════════════════════════════════
+function openAddItemForm(item) {
+  editingItemId = item ? item.id : null;
+  document.getElementById('addItemTitle').textContent = item ? 'Edit Item' : 'Add New Item';
+  const cs = document.getElementById('fi_cat');
+  cs.innerHTML = '<option value="">Select category</option>'+categories.map(c=>`<option value="${c}" ${item&&item.category===c?'selected':''}>${c}</option>`).join('');
+  const as = document.getElementById('fi_artisan');
+  as.innerHTML = '<option value="">— None / Unknown —</option>'+artisans.map(a=>`<option value="${a.id}" ${item&&item.artisanId===a.id?'selected':''}>${a.name}</option>`).join('');
+  document.getElementById('fi_name').value = item?item.name:'';
+  document.getElementById('fi_photo').value = item?item.photo:'';
+  document.getElementById('fi_materials').value = item?item.materials:'';
+  document.getElementById('fi_year').value = item?item.year:'';
+  document.getElementById('fi_details').value = item?item.details:'';
+  document.getElementById('itemSavingMsg').textContent = '';
+  document.getElementById('itemSaveBtn').disabled = false;
+  openOverlay('addItemOverlay');
+}
+
+function editItem(id) { closeOverlay('itemOverlay'); const item=items.find(i=>i.id===id); if(item) openAddItemForm(item); }
+
+function addCategory() {
+  const inp = document.getElementById('newCatInput');
+  const val = inp.value.trim();
+  if(!val) return;
+  if(!categories.includes(val)) {
+    categories.push(val);
+    buildCatStrip();
+    if(SCRIPT_URL) apiPost({action:'addCategory', sheet:'categories', name:val});
+  }
+  const cs = document.getElementById('fi_cat');
+  cs.innerHTML = '<option value="">Select category</option>'+categories.map(c=>`<option value="${c}" ${c===val?'selected':''}>${c}</option>`).join('');
+  inp.value = '';
+}
+
+async function saveItem() {
+  const name = document.getElementById('fi_name').value.trim();
+  const cat  = document.getElementById('fi_cat').value;
+  if(!name||!cat){ alert('Please fill in Item Name and Category.'); return; }
+  const artId = document.getElementById('fi_artisan').value;
+  const obj = {
+    name, category:cat,
+    artisanId: artId ? parseInt(artId) : '',
+    photo:     document.getElementById('fi_photo').value.trim(),
+    materials: document.getElementById('fi_materials').value.trim(),
+    year:      document.getElementById('fi_year').value.trim(),
+    details:   document.getElementById('fi_details').value.trim()
+  };
+
+  const btn = document.getElementById('itemSaveBtn');
+  const msg = document.getElementById('itemSavingMsg');
+  btn.disabled = true;
+  msg.textContent = 'Saving…';
+
+  if(editingItemId) {
+    const idx = items.findIndex(i=>i.id===editingItemId);
+    if(idx>-1){ items[idx]={...items[idx],...obj}; }
+    if(SCRIPT_URL) await apiPost({action:'update', sheet:'items', data:{...obj, id:editingItemId}});
+  } else {
+    const newItem = {id:nextItemId++, ...obj};
+    items.push(newItem);
+    if(SCRIPT_URL) await apiPost({action:'add', sheet:'items', data:newItem});
+  }
+
+  msg.textContent = '✓ Saved!';
+  setTimeout(()=>{ closeOverlay('addItemOverlay'); renderGallery(); }, 700);
+}
+
+async function deleteItem(id) {
+  if(!confirm('Remove this item from the collection?')) return;
+  items = items.filter(i=>i.id!==id);
+  if(SCRIPT_URL) await apiPost({action:'delete', sheet:'items', id});
+  closeOverlay('itemOverlay');
+  renderGallery();
+}
+
+// ════════════════════════════════════════
+// ADD / EDIT ARTISAN
+// ════════════════════════════════════════
+function openAddArtisanForm(a) {
+  editingArtisanId = a ? a.id : null;
+  document.getElementById('addArtisanTitle').textContent = a ? 'Edit Artisan' : 'Add New Artisan';
+  document.getElementById('fa_name').value    = a?a.name:'';
+  document.getElementById('fa_age').value     = a?a.age:'';
+  document.getElementById('fa_craft').value   = a?a.craft:'';
+  document.getElementById('fa_village').value = a?a.village:'';
+  document.getElementById('fa_district').value= a?a.district:'';
+  document.getElementById('fa_years').value   = a?a.years:'';
+  document.getElementById('fa_photo').value   = a?a.photo:'';
+  document.getElementById('fa_story').value   = a?a.story:'';
+  document.getElementById('artisanSavingMsg').textContent = '';
+  document.getElementById('artisanSaveBtn').disabled = false;
+  openOverlay('addArtisanOverlay');
+}
+
+function editArtisan(id) { closeOverlay('artisanOverlay'); const a=artisans.find(x=>x.id===id); if(a) openAddArtisanForm(a); }
+
+async function saveArtisan() {
+  const name = document.getElementById('fa_name').value.trim();
+  if(!name){ alert("Please enter the artisan's name."); return; }
+  const obj = {
+    name,
+    age:      document.getElementById('fa_age').value.trim(),
+    craft:    document.getElementById('fa_craft').value.trim(),
+    village:  document.getElementById('fa_village').value.trim(),
+    district: document.getElementById('fa_district').value.trim(),
+    years:    document.getElementById('fa_years').value.trim(),
+    photo:    document.getElementById('fa_photo').value.trim(),
+    story:    document.getElementById('fa_story').value.trim()
+  };
+  const btn = document.getElementById('artisanSaveBtn');
+  const msg = document.getElementById('artisanSavingMsg');
+  btn.disabled = true; msg.textContent = 'Saving…';
+
+  if(editingArtisanId) {
+    const idx = artisans.findIndex(a=>a.id===editingArtisanId);
+    if(idx>-1) artisans[idx]={...artisans[idx],...obj};
+    if(SCRIPT_URL) await apiPost({action:'update', sheet:'artisans', data:{...obj, id:editingArtisanId}});
+  } else {
+    const newA = {id:nextArtisanId++, ...obj};
+    artisans.push(newA);
+    if(SCRIPT_URL) await apiPost({action:'add', sheet:'artisans', data:newA});
+  }
+
+  msg.textContent = '✓ Saved!';
+  setTimeout(()=>{ closeOverlay('addArtisanOverlay'); renderArtisans(); updateStats(); }, 700);
+}
+
+async function deleteArtisan(id) {
+  if(!confirm("Remove this artisan? Their items will remain but without an artisan link.")) return;
+  items.forEach(i=>{ if(i.artisanId===id) i.artisanId=null; });
+  artisans = artisans.filter(a=>a.id!==id);
+  if(SCRIPT_URL) await apiPost({action:'delete', sheet:'artisans', id});
+  closeOverlay('artisanOverlay');
+  renderArtisans(); renderGallery();
+}
+
+// ════════════════════════════════════════
+// OVERLAYS
+// ════════════════════════════════════════
+function openOverlay(id) { document.getElementById(id).classList.add('open'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); });
+
+// ════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════
+function exportCSV() {
+  const h = ['Item Name','Category','Artisan','Village','District','Materials','Year','Photo URL','Details'];
+  const rows = items.map(i=>{
+    const a = artisans.find(x=>x.id===i.artisanId);
+    return [i.name,i.category,a?a.name:'',a?a.village:'',a?a.district:'',i.materials,i.year,i.photo,i.details]
+      .map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = [h.join(','),...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'soumadri_collections_db.csv';
+  a.click();
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+loadAll();
+</script>
+</body>
+</html>
