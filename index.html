@@ -314,7 +314,7 @@ nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;alig
     <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="itemSearch" placeholder="Search items, artisans, locations…" oninput="renderGallery()"></div>
     <button class="ctrl-btn" onclick="loadAll()">↺ Refresh</button>
     <button class="ctrl-btn" onclick="exportCSV()">⬇ Export CSV</button>
-    <button class="ctrl-btn" onclick="openSetup()">⚙ Setup</button>
+    <button class="ctrl-btn" id="setupBtn" style="display:none;" onclick="openSetup()">⚙ Setup</button>
   </div>
   <div class="cat-strip" id="catStrip"></div>
   <div class="results-info" id="resultsInfo"></div>
@@ -422,8 +422,7 @@ nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;alig
 // ════════════════════════════════════════
 // CONFIG — paste your Apps Script URL here after setup
 // ════════════════════════════════════════
-var SCRIPT_URL = localStorage.getItem('soumadriScriptUrl') || '';
-
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbworw4VkQ_Ew3tLGMOsaIhGLK3VquERKi58q44SSYPsTKomGWDis7DUAeP66_FPIqo0UA/exec';
 // ════════════════════════════════════════
 // IN-MEMORY DATA
 // ════════════════════════════════════════
@@ -927,6 +926,7 @@ function toggleAdmin() {
     document.getElementById('adminBadge').className = 'admin-badge locked';
     document.getElementById('fabBtn').classList.remove('visible');
     document.querySelectorAll('.edit-btns').forEach(el=>el.classList.remove('visible'));
+    document.getElementById('setupBtn').style.display='none';
   } else {
     // Show login
     document.getElementById('adminPwInput').value = '';
@@ -945,6 +945,7 @@ function checkAdminPw() {
     document.getElementById('adminBadge').className = 'admin-badge unlocked';
     document.getElementById('fabBtn').classList.add('visible');
     document.querySelectorAll('.edit-btns').forEach(el=>el.classList.add('visible'));
+    document.getElementById('setupBtn').style.display='block';
   } else {
     document.getElementById('adminErr').textContent = 'Incorrect password. Try again.';
     document.getElementById('adminPwInput').value = '';
