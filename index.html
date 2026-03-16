@@ -315,6 +315,18 @@ nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;alig
     <button class="ctrl-btn" onclick="loadAll()">↺ Refresh</button>
     <button class="ctrl-btn" onclick="exportCSV()">⬇ Export CSV</button>
     <button class="ctrl-btn" id="setupBtn" style="display:none;" onclick="openSetup()">⚙ Setup</button>
+    <select class="ctrl-btn" id="districtFilter" onchange="renderGallery()" style="cursor:pointer;">
+      <option value="">All Districts</option>
+      <option>Alipurduar</option><option>Bankura</option><option>Birbhum</option>
+      <option>Cooch Behar</option><option>Dakshin Dinajpur</option><option>Darjeeling</option>
+      <option>Hooghly</option><option>Howrah</option><option>Jalpaiguri</option>
+      <option>Jhargram</option><option>Kalimpong</option><option>Kolkata</option>
+      <option>Malda</option><option>Murshidabad</option><option>Nadia</option>
+      <option>North 24 Parganas</option><option>Paschim Bardhaman</option>
+      <option>Paschim Medinipur</option><option>Purba Bardhaman</option>
+      <option>Purba Medinipur</option><option>Purulia</option>
+      <option>South 24 Parganas</option><option>Uttar Dinajpur</option>
+    </select>
   </div>
   <div class="cat-strip" id="catStrip"></div>
   <div class="results-info" id="resultsInfo"></div>
@@ -349,9 +361,32 @@ nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;alig
       <div class="fg full"><label>Item Name *</label><input type="text" id="fi_name" placeholder="e.g. Dancing Ganesha Dokra"></div>
       <div class="fg"><label>Category *</label><select id="fi_cat"></select></div>
       <div class="fg"><label>Artisan</label><select id="fi_artisan"></select></div>
-      <div class="fg full"><label>Photo URL (from Google Photos)</label><input type="text" id="fi_photo" placeholder="Paste direct image link here"></div>
+     <div class="fg full"><label>Photo URL (from Google Drive)</label><input type="text" id="fi_photo" placeholder="Paste direct image link here"></div>
+      <div class="fg full"><label>Thumbnail Focus Point</label>
+        <select id="fi_focus">
+          <option value="center">Centre (default)</option>
+          <option value="top">Top — show top of image</option>
+          <option value="bottom">Bottom — show bottom of image</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
       <div class="fg"><label>Materials Used</label><input type="text" id="fi_materials" placeholder="e.g. Bell metal, wax"></div>
       <div class="fg"><label>Year Acquired</label><input type="text" id="fi_year" placeholder="e.g. 2024"></div>
+      <div class="fg"><label>District</label>
+        <select id="fi_district">
+          <option value="">— Select District —</option>
+          <option>Alipurduar</option><option>Bankura</option><option>Birbhum</option>
+          <option>Cooch Behar</option><option>Dakshin Dinajpur</option><option>Darjeeling</option>
+          <option>Hooghly</option><option>Howrah</option><option>Jalpaiguri</option>
+          <option>Jhargram</option><option>Kalimpong</option><option>Kolkata</option>
+          <option>Malda</option><option>Murshidabad</option><option>Nadia</option>
+          <option>North 24 Parganas</option><option>Paschim Bardhaman</option>
+          <option>Paschim Medinipur</option><option>Purba Bardhaman</option>
+          <option>Purba Medinipur</option><option>Purulia</option>
+          <option>South 24 Parganas</option><option>Uttar Dinajpur</option>
+        </select>
+      </div>
       <div class="fg full"><label>Description & Story</label><textarea id="fi_details" placeholder="Describe the piece, its significance, technique…"></textarea></div>
       <div class="fg full"><label>Add a New Category</label><div class="add-cat-row"><input type="text" id="newCatInput" placeholder="e.g. Jute Craft, Bamboo Work…"><button onclick="addCategory()">+ Add</button></div></div>
     </div>
@@ -372,8 +407,20 @@ nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;alig
       <div class="fg"><label>Age</label><input type="text" id="fa_age" placeholder="e.g. 58"></div>
       <div class="fg"><label>Primary Craft</label><input type="text" id="fa_craft" placeholder="e.g. Dokra"></div>
       <div class="fg"><label>Village</label><input type="text" id="fa_village" placeholder="e.g. Bikna"></div>
-      <div class="fg"><label>District</label><input type="text" id="fa_district" placeholder="e.g. Bankura"></div>
-      <div class="fg"><label>Years Practising</label><input type="text" id="fa_years" placeholder="e.g. 35"></div>
+<div class="fg"><label>District</label>
+        <select id="fa_district">
+          <option value="">— Select District —</option>
+          <option>Alipurduar</option><option>Bankura</option><option>Birbhum</option>
+          <option>Cooch Behar</option><option>Dakshin Dinajpur</option><option>Darjeeling</option>
+          <option>Hooghly</option><option>Howrah</option><option>Jalpaiguri</option>
+          <option>Jhargram</option><option>Kalimpong</option><option>Kolkata</option>
+          <option>Malda</option><option>Murshidabad</option><option>Nadia</option>
+          <option>North 24 Parganas</option><option>Paschim Bardhaman</option>
+          <option>Paschim Medinipur</option><option>Purba Bardhaman</option>
+          <option>Purba Medinipur</option><option>Purulia</option>
+          <option>South 24 Parganas</option><option>Uttar Dinajpur</option>
+        </select>
+      </div>      <div class="fg"><label>Years Practising</label><input type="text" id="fa_years" placeholder="e.g. 35"></div>
       <div class="fg full"><label>Photo URL (from Google Photos)</label><input type="text" id="fa_photo" placeholder="Paste direct image link here"></div>
       <div class="fg full"><label>Craft Tradition & Background Story</label><textarea id="fa_story" placeholder="Their background, how they learnt, what makes their work distinctive…"></textarea></div>
     </div>
@@ -560,8 +607,10 @@ function renderGallery() {
   const filtered = items.filter(item=>{
     const a = artisans.find(x=>x.id===item.artisanId);
     const mc = activeCat==='all'||item.category===activeCat;
+    const activeDist = document.getElementById('districtFilter').value;
+    const md = !activeDist||(item.district&&item.district===activeDist)||(a&&a.district===activeDist);
     const ms = !term||item.name.toLowerCase().includes(term)||item.category.toLowerCase().includes(term)||(item.materials||'').toLowerCase().includes(term)||(a&&a.name.toLowerCase().includes(term))||(a&&(a.district||'').toLowerCase().includes(term))||(a&&(a.village||'').toLowerCase().includes(term));
-    return mc&&ms;
+    return mc&&ms&&md;
   });
   document.getElementById('resultsInfo').textContent = filtered.length===items.length?`Showing all ${items.length} items`:`Showing ${filtered.length} of ${items.length} items`;
   updateStats();
@@ -575,8 +624,7 @@ function renderGallery() {
   g.innerHTML = filtered.map((item,i)=>{
     const a = artisans.find(x=>x.id===item.artisanId);
     return `<div class="card" style="animation-delay:${i*0.03}s" onclick="openItem(${item.id})">
-      ${item.photo?`<img class="card-photo" src="${item.photo}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'card-ph\\'>${gE(item.category)}</div>'">`:`<div class="card-ph">${gE(item.category)}</div>`}
-      <div class="card-body">
+${item.photo?`<img class="card-photo" src="${item.photo}" alt="${item.name}" style="object-position:${item.focus||'center'}" onerror="this.outerHTML='<div class=\\'card-ph\\'>${gE(item.category)}</div>'">`:`<div class="card-ph">${gE(item.category)}</div>`}      <div class="card-body">
         <div class="card-cat">${item.category||''}</div>
         <div class="card-name">${item.name}</div>
         ${a?`<div class="card-artist">by ${a.name}</div>`:''}
@@ -755,8 +803,10 @@ function openAddItemForm(item) {
   as.innerHTML = '<option value="">— None / Unknown —</option>'+artisans.map(a=>`<option value="${a.id}" ${item&&item.artisanId===a.id?'selected':''}>${a.name}</option>`).join('');
   document.getElementById('fi_name').value = item?item.name:'';
   document.getElementById('fi_photo').value = item?item.photo:'';
+  document.getElementById('fi_focus').value = item?item.focus||'center':'center';
   document.getElementById('fi_materials').value = item?item.materials:'';
   document.getElementById('fi_year').value = item?item.year:'';
+  document.getElementById('fi_district').value = item?item.district||'':'';
   document.getElementById('fi_details').value = item?item.details:'';
   document.getElementById('itemSavingMsg').textContent = '';
   document.getElementById('itemSaveBtn').disabled = false;
@@ -788,8 +838,10 @@ async function saveItem() {
     name, category:cat,
     artisanId: artId ? parseInt(artId) : '',
     photo:     document.getElementById('fi_photo').value.trim(),
+    focus:     document.getElementById('fi_focus').value,
     materials: document.getElementById('fi_materials').value.trim(),
     year:      document.getElementById('fi_year').value.trim(),
+    district:  document.getElementById('fi_district').value,
     details:   document.getElementById('fi_details').value.trim()
   };
 
@@ -920,7 +972,6 @@ var isAdmin = false;
 
 function toggleAdmin() {
   if(isAdmin) {
-    // Lock
     isAdmin = false;
     document.getElementById('adminBadge').textContent = '🔒 Admin';
     document.getElementById('adminBadge').className = 'admin-badge locked';
@@ -928,7 +979,6 @@ function toggleAdmin() {
     document.querySelectorAll('.edit-btns').forEach(el=>el.classList.remove('visible'));
     document.getElementById('setupBtn').style.display='none';
   } else {
-    // Show login
     document.getElementById('adminPwInput').value = '';
     document.getElementById('adminErr').textContent = '';
     openOverlay('adminOverlay');
