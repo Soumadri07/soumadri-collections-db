@@ -313,7 +313,7 @@ nav{background:var(--indigo);position:sticky;top:0;z-index:200;display:flex;alig
   <div class="controls-bar">
     <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="itemSearch" placeholder="Search items, artisans, locations…" oninput="renderGallery()"></div>
     <button class="ctrl-btn" onclick="loadAll()">↺ Refresh</button>
-    <button class="ctrl-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="ctrl-btn" id="exportBtn" style="display:none;" onclick="exportCSV()">⬇ Export CSV</button>
     <button class="ctrl-btn" id="setupBtn" style="display:none;" onclick="openSetup()">⚙ Setup</button>
     <select class="ctrl-btn" id="districtFilter" onchange="renderGallery()" style="cursor:pointer;">
       <option value="">All Districts</option>
@@ -978,6 +978,7 @@ function toggleAdmin() {
     document.getElementById('fabBtn').classList.remove('visible');
     document.querySelectorAll('.edit-btns').forEach(el=>el.classList.remove('visible'));
     document.getElementById('setupBtn').style.display='none';
+    document.getElementById('exportBtn').style.display='none';
   } else {
     document.getElementById('adminPwInput').value = '';
     document.getElementById('adminErr').textContent = '';
@@ -996,6 +997,7 @@ function checkAdminPw() {
     document.getElementById('fabBtn').classList.add('visible');
     document.querySelectorAll('.edit-btns').forEach(el=>el.classList.add('visible'));
     document.getElementById('setupBtn').style.display='block';
+    document.getElementById('exportBtn').style.display='block';
   } else {
     document.getElementById('adminErr').textContent = 'Incorrect password. Try again.';
     document.getElementById('adminPwInput').value = '';
