@@ -730,7 +730,7 @@ function openArtisan(id) {
     <div class="artisan-detail-hero">
       <div class="artisan-detail-inner">
         ${a.photo
-          ? `<img class="artisan-detail-photo" src="${a.photo}" alt="${a.name}" onerror="this.outerHTML='<div class=\\'artisan-detail-photo-ph\\'>👤</div>'">`
+          ? `<img class="artisan-detail-photo img-clickable" src="${a.photo}" alt="${a.name}" onclick="openLightbox('${a.photo}','${a.name}')" onerror="this.outerHTML='<div class=\\'artisan-detail-photo-ph\\'>👤</div>'">`
           : `<div class="artisan-detail-photo-ph">👤</div>`}
         <div>
           <div class="artisan-detail-name">${a.name.split(' ').slice(0,-1).join(' ')}<br><em>${a.name.split(' ').slice(-1)}</em></div>
