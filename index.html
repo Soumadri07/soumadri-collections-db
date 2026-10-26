@@ -680,7 +680,7 @@ function openItem(id) {
     <div class="detail-layout">
       <div class="detail-img-wrap">
         ${item.photo
-          ? `<img src="${item.photo}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'detail-img-ph\\'>${gE(item.category)}</div>'">`
+          ? `<img src="${item.photo}" alt="${item.name}" class="img-clickable" onclick="openLightbox('${item.photo}','${item.name}')" onerror="this.outerHTML='<div class=\\'detail-img-ph\\'>${gE(item.category)}</div>'">`
           : `<div class="detail-img-ph">${gE(item.category)}</div>`}
         ${item.photo?`<div class="detail-img-zoom">Click image to view full size</div>`:''}
       </div>
